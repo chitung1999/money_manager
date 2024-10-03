@@ -7,7 +7,6 @@ import '../common/enum.dart';
 Database database = Database();
 Client client = Client();
 Databases databases = Databases(client);
-String xxxxx = '';
 
 class DataModel {
   late int day;
@@ -244,7 +243,6 @@ class Database {
       }
     } catch(e) {
       print('Fail to add data: $e');
-      xxxxx = 'Fail to add data: $e';
       return StatusApp.ERROR;
     }
   }

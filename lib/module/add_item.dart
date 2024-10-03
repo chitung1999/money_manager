@@ -319,13 +319,11 @@ class _AddItemState extends State<AddItem> {
                       if(ret == StatusApp.SUCCESS) {
                         widget.onAdd(month);
                         showNotify(context, true, 'Thêm dữ liệu thành công');
-                      } else {showNotify(context, false, xxxxx);
-
-                        // showNotify(context, false, 'Không thể thêm dữ liệu!');
+                      } else {
+                        showNotify(context, false, 'Không thể thêm dữ liệu!');
                       }
                     } catch (e) {
-                      showNotify(context, false, xxxxx);
-                      // showNotify(context, false, 'Giá không hợp lệ!');
+                      showNotify(context, false, 'Giá không hợp lệ!');
                     }
                   }
                 },

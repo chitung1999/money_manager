@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'module/detail.dart';
 import 'common/drop_down.dart';
-import 'common/enum.dart';
 import 'database/database.dart';
 import 'module/add_item.dart';
 import 'module/home.dart';
