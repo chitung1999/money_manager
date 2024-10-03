@@ -47,7 +47,13 @@ class _TheAppState extends State<TheApp> {
       theme: ThemeData(brightness: Brightness.light, fontFamily: 'Roboto'),
       home: Scaffold(
         appBar: AppBar(
-          title: const Text('Money Manager', style: TextStyle(fontSize: 30, fontWeight: FontWeight.bold, color: Colors.white)),
+          title: Row(
+            crossAxisAlignment: CrossAxisAlignment.end,
+            children: [
+              const Text('Money', style: TextStyle(fontSize: 30, fontWeight: FontWeight.bold, color: Colors.white)),
+              const Text('manager', style: TextStyle(fontSize: 15, fontWeight: FontWeight.bold, color: Colors.white)),
+            ],
+          ),
           flexibleSpace: Container(
             decoration: const BoxDecoration(
               gradient: LinearGradient(
