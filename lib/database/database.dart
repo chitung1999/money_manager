@@ -7,6 +7,7 @@ import '../common/enum.dart';
 Database database = Database();
 Client client = Client();
 Databases databases = Databases(client);
+String xxxxx = '';
 
 class DataModel {
   late int day;
@@ -51,19 +52,26 @@ class Database {
       StatusApp ret = loadData(strData);
       if(ret == StatusApp.SUCCESS) {
         await writeFileLocal(strData);
-      } else {
-        strData = await readFileLocal();
-        ret = loadData(strData);
+        return ret;
       }
-
-      return ret;
     } catch(e) {
       print('Connection to Appwrite failed: $e');
-      return StatusApp.ERROR ;
+    }
+
+    try {
+      Map<String, dynamic> dynamicData = await readFileLocal();
+      Map<String, String> strData = dynamicData.map((key, value) {
+        return MapEntry(key, value.toString());
+      });
+      StatusApp ret = loadData(strData);
+      return ret;
+    } catch(e) {
+      print('Real file local failed: $e');
+      return StatusApp.ERROR;
     }
   }
 
-  Future<Map<String, String>> readFileLocal() async {
+  Future<Map<String, dynamic>> readFileLocal() async {
     try {
       final directory = await getApplicationDocumentsDirectory();
       final file = File('${directory.path}/money_database.json');
@@ -188,7 +196,10 @@ class Database {
   Future<StatusApp> addData(String month, DataModel item) async {
     try {
       if (data.keys.contains(month)) {
-        List<DataModel> dataMonth = data[month]!;
+        List<DataModel> dataMonth = [];
+        for(var value in data[month]!) {
+          dataMonth.add(value);
+        }
         dataMonth.add(item);
         dataMonth.sort((a, b) => b.day.compareTo(a.day));
 
@@ -213,7 +224,7 @@ class Database {
             data: {'data': strData},
           );
 
-          return StatusApp.SUCCESS;
+          return initialize();
         } else {
           return StatusApp.ERROR;
         }
@@ -233,6 +244,7 @@ class Database {
       }
     } catch(e) {
       print('Fail to add data: $e');
+      xxxxx = 'Fail to add data: $e';
       return StatusApp.ERROR;
     }
   }

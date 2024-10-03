@@ -309,7 +309,7 @@ class _AddItemState extends State<AddItem> {
                 onPressed: () async {
                   if(_item.text.isEmpty || _price.text.isEmpty || indexName == null ||
                       indexUseType == null || indexItemType == null) {
-                    showNotify(context, false, 'Some fields are empty!');
+                    showNotify(context, false, 'Một số trường trống!');
                   } else {
                     try {
                       int price = int.parse(_price.text);
@@ -319,11 +319,13 @@ class _AddItemState extends State<AddItem> {
                       if(ret == StatusApp.SUCCESS) {
                         widget.onAdd(month);
                         showNotify(context, true, 'Thêm dữ liệu thành công');
-                      } else {
-                        showNotify(context, false, 'Không thể thêm dữ liệu!');
+                      } else {showNotify(context, false, xxxxx);
+
+                        // showNotify(context, false, 'Không thể thêm dữ liệu!');
                       }
                     } catch (e) {
-                      showNotify(context, false, 'Giá không hợp lệ!');
+                      showNotify(context, false, xxxxx);
+                      // showNotify(context, false, 'Giá không hợp lệ!');
                     }
                   }
                 },
