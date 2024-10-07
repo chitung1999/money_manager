@@ -105,7 +105,7 @@ class Database {
           if(value.isEmpty) {
             continue;
           }
-          List<String> l = value.split(',');
+          List<String> l = value.split('|');
           dataMonth.add(DataModel(int.parse(l[0]), Member.values[int.parse(l[1])],
               l[2], ItemType.values[int.parse(l[3])], UseType.values[int.parse(l[4])], int.parse(l[5])));
         }
@@ -195,12 +195,15 @@ class Database {
   Future<StatusApp> addData(String month, DataModel item) async {
     try {
       if (data.keys.contains(month)) {
-        List<DataModel> dataMonth = [];
-        for(var value in data[month]!) {
-          dataMonth.add(value);
+        List<DataModel> dataMonth = data[month]!;
+        int index = 0;
+          for(index; index < dataMonth.length; index++) {
+          if(item.day >= dataMonth[index].day) {
+            break;
+          }
         }
-        dataMonth.add(item);
-        dataMonth.sort((a, b) => b.day.compareTo(a.day));
+        dataMonth.insert(index, item);
+        data[month] = dataMonth;
 
         var response = await databases.listDocuments(
           databaseId: '66fd5e4c001b5722c3a4',
@@ -213,7 +216,7 @@ class Database {
 
           String strData = '';
           for (var value in dataMonth) {
-            strData += '${value.day},${value.name.index},${value.item},${value.itemType.index},${value.useType.index},${value.price}\n';
+            strData += '${value.day}|${value.name.index}|${value.item}|${value.itemType.index}|${value.useType.index}|${value.price}\n';
           }
 
           await databases.updateDocument(
@@ -229,7 +232,7 @@ class Database {
         }
       }
       else {
-        String dataItem = '${item.day},${item.name.index},${item.item},${item.itemType.index},${item.useType.index},${item.price}\n';
+        String dataItem = '${item.day}|${item.name.index}|${item.item}|${item.itemType.index}|${item.useType.index}|${item.price}\n';
         await databases.createDocument(
           databaseId: '66fd5e4c001b5722c3a4',
           collectionId: '66fd5e670026f81adec9',
@@ -243,6 +246,41 @@ class Database {
       }
     } catch(e) {
       print('Fail to add data: $e');
+      return StatusApp.ERROR;
+    }
+  }
+
+  Future<StatusApp> removeData(String month, int index) async {
+    try {
+      data[month]!.removeAt(index);
+
+      var response = await databases.listDocuments(
+        databaseId: '66fd5e4c001b5722c3a4',
+        collectionId: '66fd5e670026f81adec9',
+        queries: [Query.equal('month', month)],
+      );
+
+      if (response.documents.isNotEmpty) {
+        String documentId = response.documents.first.$id;
+
+        String strData = '';
+        for (var value in data[month]!) {
+          strData += '${value.day}|${value.name.index}|${value.item}|${value.itemType.index}|${value.useType.index}|${value.price}\n';
+        }
+
+        await databases.updateDocument(
+          databaseId: '66fd5e4c001b5722c3a4',
+          collectionId: '66fd5e670026f81adec9',
+          documentId: documentId,
+          data: {'data': strData},
+        );
+
+        return initialize();
+      } else {
+        return StatusApp.ERROR;
+      }
+    } catch(e) {
+      print('Fail to remove data: $e');
       return StatusApp.ERROR;
     }
   }

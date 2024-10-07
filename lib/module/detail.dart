@@ -1,11 +1,15 @@
 import 'package:flutter/material.dart';
+import 'package:money_manager/common/text_box_btn.dart';
 import '../common/drop_down.dart';
+import '../common/enum.dart';
+import '../common/notify.dart';
 import '../database/database.dart';
 
 class Detail extends StatefulWidget {
-  const Detail({super.key, required this.month});
+  const Detail({super.key, required this.month, required this.onRemove});
 
   final String month;
+  final Function(String) onRemove;
 
   @override
   _DetailState createState() => _DetailState();
@@ -13,6 +17,7 @@ class Detail extends StatefulWidget {
 
 class _DetailState extends State<Detail> {
   final List<List<String>> _data = [];
+  final List<bool> _isEdit = [];
   final List<String> _titles = ['Ngày', 'Tên', 'SP','Giá', 'Loại SD', 'Loại SP'];
   final List<double> _width = [1/8, 1/7, 1/5, 1/6, 1/7, 1/5];
   final List<String> _name = ['Tên','Tùng', 'Trúc'];
@@ -22,8 +27,17 @@ class _DetailState extends State<Detail> {
   late String _filterTypeItem;
   late String _filterTypeUse;
 
+  void _onEdit(int? index) {
+    for(int i = 0; i < _isEdit.length; i++) {
+      _isEdit[i] = false;
+    }
+    if (index != null) _isEdit[index] = true;
+    setState(() {});
+  }
+
   void _onFilter() {
     _data.clear();
+    _isEdit.clear();
     List<DataModel> data = database.getDataDetail(widget.month, _name.indexOf(_filterName), _typeItem.indexOf(_filterTypeItem), _typeUse.indexOf(_filterTypeUse));
     for (var item in data) {
       _data.add([
@@ -34,6 +48,7 @@ class _DetailState extends State<Detail> {
         _typeUse[item.useType.index + 1],
         _typeItem[item.itemType.index + 1]
       ]);
+      _isEdit.add(false);
     }
     setState(() {});
   }
@@ -104,24 +119,50 @@ class _DetailState extends State<Detail> {
         ),
         Expanded(child: ListView(
           children: List.generate(
-            _data.length, (index) => Container(
-            height: 40,
-            decoration: BoxDecoration(
-                border: Border.all(color: Colors.blueGrey.withOpacity(0.2))
-            ),
-            child: Row(
-              children: [
-                for(int i = 0; i < _titles.length; i++)
-                  SizedBox(
-                    width: _width[i] * width,
-                    child: Center(child: Text(_data[index][i]))
-                  )
-              ],
-            ),
-          ),
-          )
+            _data.length, (index) => GestureDetector(
+            onLongPress: () {_onEdit(index);},
+            child: Container(
+              height: 40,
+              decoration: BoxDecoration(border: Border.all(color: Colors.blueGrey.withOpacity(0.2))),
+              child: Stack(
+                children: [
+                  Row(
+                    children: [for(int i = 0; i < 6; i++)
+                      SizedBox(
+                        width: _width[i] * width,
+                        child: Center(child: Text(_data[index][i]))
+                      )
+                    ]
+                  ),
+                  AnimatedPositioned(
+                    duration: Duration(milliseconds: 200),
+                    right: _isEdit[index] ? 0 : -200,
+                    child: Row(
+                      children: [
+                        TextBoxBtn(title: 'Xoá', width: 100, height: 40, radius: 5, bgColor: Colors.red[400],
+                          outlineColor: Colors.transparent,
+                          onPressed: () async {
+                            StatusApp ret = await database.removeData(
+                              widget.month, index);
+                            if (ret == StatusApp.SUCCESS) {
+                              widget.onRemove(widget.month);
+                              showNotify(context, true, 'Thêm dữ liệu thành công');
+                            } else {
+                              showNotify(context, false, 'Không thể thêm dữ liệu!');
+                            }
+                          }
+                        ),
+                        TextBoxBtn(title: 'Huỷ', width: 100, height: 40, radius: 5, bgColor: Colors.grey,
+                            outlineColor: Colors.transparent, onPressed: (){_onEdit(null);})
+                      ],
+                    ),
+                  ),
+                ]
+              )
+            )
+          ))
         ))
-      ],
+      ]
     );
   }
 }

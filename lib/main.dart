@@ -32,6 +32,17 @@ class _TheAppState extends State<TheApp> {
     _listMonth.sort((a, b) => b.substring(3).compareTo(a.substring(3)));
   }
 
+  void _onModify(String month) {
+    setState(() {
+      if(_currentMonth != month) {
+        loadMonth();
+        _currentMonth = month;
+      }
+      _currentIndex = 1;
+    });
+    reloadApp();
+  }
+
   @override
   void initState() {
     _currentIndex = 0;
@@ -84,17 +95,8 @@ class _TheAppState extends State<TheApp> {
                 index: _currentIndex,
                 children: [
                   Home(key: ValueKey(_currentMonth), month: _currentMonth),
-                  Detail(key: ValueKey(_currentMonth), month: _currentMonth),
-                  AddItem(onAdd: (String month) {
-                    setState(() {
-                      if(_currentMonth != month) {
-                        loadMonth();
-                        _currentMonth = month;
-                      }
-                      _currentIndex = 1;
-                    });
-                    reloadApp();
-                  }),
+                  Detail(key: ValueKey(_currentMonth), month: _currentMonth, onRemove: _onModify),
+                  AddItem(onAdd: _onModify),
                 ],
               );
             } else {
