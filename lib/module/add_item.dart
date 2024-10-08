@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:date_time_picker_widget/date_time_picker_widget.dart';
 import '../common/notify.dart';
 import '../common/text_box_btn.dart';
 import '../common/enum.dart';
+import '../common/date_picker.dart';
 import '../database/database.dart';
 
 class AddItem extends StatefulWidget {
@@ -15,7 +15,7 @@ class AddItem extends StatefulWidget {
 }
 
 class _AddItemState extends State<AddItem> {
-  DateTime _time = DateTime.now();
+  DateTime _date = DateTime.now();
   final TextEditingController _item = TextEditingController();
   final TextEditingController _price = TextEditingController();
   int? indexName;
@@ -28,12 +28,7 @@ class _AddItemState extends State<AddItem> {
       padding: const EdgeInsets.symmetric(horizontal: 30, vertical: 20),
       child: Column(
         children: [
-          DateTimePicker(
-            type: DateTimePickerType.Date,
-            datePickerTitle: 'Thời gian',
-            customStringWeekdays: const ['Su', 'Mo', 'Tu', 'We', 'Th', 'Fr', 'Sa'],
-            onDateChanged: (date) {setState(() {_time = date;});},
-          ),
+          DatePicker(onDateChanged: (date){setState(() {_date = date;});}),
           const SizedBox(height: 50),
           TextField(
             controller: _item,
@@ -77,8 +72,8 @@ class _AddItemState extends State<AddItem> {
                   height: 40,
                   radius: 5,
                   bgColor: indexName == 0 ? Colors.deepPurple[100] : Colors.white,
-                  textColor: Colors.deepPurple,
-                  outlineColor: Colors.deepPurple,
+                  textColor: Colors.blueGrey,
+                  outlineColor: Colors.blueGrey,
                   onPressed: () {setState(() {indexName = 0;});},
                 )),
                 const SizedBox(width: 30),
@@ -87,8 +82,8 @@ class _AddItemState extends State<AddItem> {
                   height: 40,
                   radius: 5,
                   bgColor: indexName == 1 ? Colors.deepPurple[100] : Colors.white,
-                  textColor: Colors.deepPurple,
-                  outlineColor: Colors.deepPurple,
+                  textColor: Colors.blueGrey,
+                  outlineColor: Colors.blueGrey,
                   onPressed: () {setState(() {indexName = 1;});},
                 )),
               ],
@@ -109,8 +104,8 @@ class _AddItemState extends State<AddItem> {
                   height: 40,
                   radius: 5,
                   bgColor: indexUseType == 0 ? Colors.deepPurple[100] : Colors.white,
-                  textColor: Colors.deepPurple,
-                  outlineColor: Colors.deepPurple,
+                  textColor: Colors.blueGrey,
+                  outlineColor: Colors.blueGrey,
                   onPressed: () {setState(() {indexUseType = 0;});},
                 )),
                 const SizedBox(width: 30),
@@ -119,8 +114,8 @@ class _AddItemState extends State<AddItem> {
                   height: 40,
                   radius: 5,
                   bgColor: indexUseType == 1 ? Colors.deepPurple[100] : Colors.white,
-                  textColor: Colors.deepPurple,
-                  outlineColor: Colors.deepPurple,
+                  textColor: Colors.blueGrey,
+                  outlineColor: Colors.blueGrey,
                   onPressed: () {setState(() {indexUseType = 1;});},
                 )),
               ],
@@ -146,8 +141,8 @@ class _AddItemState extends State<AddItem> {
                             height: 40,
                             radius: 5,
                             bgColor: indexItemType == 0 ? Colors.deepPurple[100] : Colors.white,
-                            textColor: Colors.deepPurple,
-                            outlineColor: Colors.deepPurple,
+                            textColor: Colors.blueGrey,
+                            outlineColor: Colors.blueGrey,
                             textSize: 15,
                             onPressed: () {setState(() {indexItemType = 0;});},
                           )),
@@ -157,8 +152,8 @@ class _AddItemState extends State<AddItem> {
                             height: 40,
                             radius: 5,
                             bgColor: indexItemType == 1 ? Colors.deepPurple[100] : Colors.white,
-                            textColor: Colors.deepPurple,
-                            outlineColor: Colors.deepPurple,
+                            textColor: Colors.blueGrey,
+                            outlineColor: Colors.blueGrey,
                             textSize: 15,
                             onPressed: () {setState(() {indexItemType = 1;});},
                           )),
@@ -172,8 +167,8 @@ class _AddItemState extends State<AddItem> {
                             height: 40,
                             radius: 5,
                             bgColor: indexItemType == 2 ? Colors.deepPurple[100] : Colors.white,
-                            textColor: Colors.deepPurple,
-                            outlineColor: Colors.deepPurple,
+                            textColor: Colors.blueGrey,
+                            outlineColor: Colors.blueGrey,
                             textSize: 15,
                             onPressed: () {setState(() {indexItemType = 2;});},
                           )),
@@ -183,8 +178,8 @@ class _AddItemState extends State<AddItem> {
                             height: 40,
                             radius: 5,
                             bgColor: indexItemType == 3 ? Colors.deepPurple[100] : Colors.white,
-                            textColor: Colors.deepPurple,
-                            outlineColor: Colors.deepPurple,
+                            textColor: Colors.blueGrey,
+                            outlineColor: Colors.blueGrey,
                             textSize: 15,
                             onPressed: () {setState(() {indexItemType = 3;});},
                           )),
@@ -198,8 +193,8 @@ class _AddItemState extends State<AddItem> {
                             height: 40,
                             radius: 5,
                             bgColor: indexItemType == 4 ? Colors.deepPurple[100] : Colors.white,
-                            textColor: Colors.deepPurple,
-                            outlineColor: Colors.deepPurple,
+                            textColor: Colors.blueGrey,
+                            outlineColor: Colors.blueGrey,
                             textSize: 15,
                             onPressed: () {setState(() {indexItemType = 4;});},
                           )),
@@ -209,8 +204,8 @@ class _AddItemState extends State<AddItem> {
                             height: 40,
                             radius: 5,
                             bgColor: indexItemType == 5 ? Colors.deepPurple[100] : Colors.white,
-                            textColor: Colors.deepPurple,
-                            outlineColor: Colors.deepPurple,
+                            textColor: Colors.blueGrey,
+                            outlineColor: Colors.blueGrey,
                             textSize: 15,
                             onPressed: () {setState(() {indexItemType = 5;});},
                           )),
@@ -224,8 +219,8 @@ class _AddItemState extends State<AddItem> {
                             height: 40,
                             radius: 5,
                             bgColor: indexItemType == 6 ? Colors.deepPurple[100] : Colors.white,
-                            textColor: Colors.deepPurple,
-                            outlineColor: Colors.deepPurple,
+                            textColor: Colors.blueGrey,
+                            outlineColor: Colors.blueGrey,
                             textSize: 15,
                             onPressed: () {setState(() {indexItemType = 6;});},
                           )),
@@ -250,7 +245,7 @@ class _AddItemState extends State<AddItem> {
                 textColor: Colors.blueGrey,
                 onPressed: () {
                   setState(() {
-                    _time = DateTime.now();
+                    _date = DateTime.now();
                     _item.text = '';
                     _price.text = '';
                     indexName = null;
@@ -273,8 +268,8 @@ class _AddItemState extends State<AddItem> {
                   } else {
                     try {
                       int price = int.parse(_price.text);
-                      String month = '${_time.month.toString().padLeft(2, '0')}/${_time.year}';
-                      DataModel item = DataModel(_time.day, Member.values[indexName!], _item.text, ItemType.values[indexItemType!], UseType.values[indexUseType!], price);
+                      String month = '${_date.month.toString().padLeft(2, '0')}/${_date.year}';
+                      DataModel item = DataModel(_date.day, Member.values[indexName!], _item.text, ItemType.values[indexItemType!], UseType.values[indexUseType!], price);
                       StatusApp ret = await database.addData(month, item);
                       if(ret == StatusApp.SUCCESS) {
                         widget.onAdd(month);
