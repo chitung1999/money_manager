@@ -22,6 +22,17 @@ class _AddItemState extends State<AddItem> {
   int? indexUseType;
   int? indexItemType;
 
+  _resetData() {
+    setState(() {
+      _date = DateTime.now();
+      _item.text = '';
+      _price.text = '';
+      indexName = null;
+      indexUseType = null;
+      indexItemType = null;
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     return SingleChildScrollView(
@@ -243,16 +254,7 @@ class _AddItemState extends State<AddItem> {
                 radius: 5,
                 bgColor: Colors.white,
                 textColor: Colors.blueGrey,
-                onPressed: () {
-                  setState(() {
-                    _date = DateTime.now();
-                    _item.text = '';
-                    _price.text = '';
-                    indexName = null;
-                    indexUseType = null;
-                    indexItemType = null;
-                  });
-                },
+                onPressed: () {_resetData();},
               )),
               const SizedBox(width: 30),
               Expanded(child: TextBoxBtn(
@@ -270,10 +272,15 @@ class _AddItemState extends State<AddItem> {
                       int price = int.parse(_price.text);
                       String month = '${_date.month.toString().padLeft(2, '0')}/${_date.year}';
                       DataModel item = DataModel(_date.day, Member.values[indexName!], _item.text, ItemType.values[indexItemType!], UseType.values[indexUseType!], price);
+                      showWaitingProcess(context);
                       StatusApp ret = await database.addData(month, item);
+                      Navigator.of(context).pop();
                       if(ret == StatusApp.SUCCESS) {
                         widget.onAdd(month);
+                        _resetData();
                         showNotify(context, true, 'Thêm dữ liệu thành công');
+                      } else if (ret == StatusApp.REQUEST_RESET) {
+                        showNotify(context, false, 'Vui lòng khởi động lại ứng dụng trước khi thêm dữ liệu!');
                       } else {
                         showNotify(context, false, 'Không thể thêm dữ liệu!');
                       }

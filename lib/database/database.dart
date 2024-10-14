@@ -34,38 +34,35 @@ class Database {
   }
 
   Map<String, List<DataModel>> data = {};
+  Map<String, String> strData = {};
 
   Future<StatusApp> initialize() async {
+    data = {};
+    strData = {};
     try {
       client.setEndpoint('https://cloud.appwrite.io/v1').setProject('66fd5db5001845b85a99').setSelfSigned(status: true);
-
       var response = await databases.listDocuments(
         databaseId: '66fd5e4c001b5722c3a4',
         collectionId: '66fd5e670026f81adec9',
       );
-      Map<String, String> strData = {};
+
       for (var document in response.documents) {
         strData[document.data['month']] = document.data['data'];
       }
-
-      StatusApp ret = loadData(strData);
-      if(ret == StatusApp.SUCCESS) {
+      if(loadData() == StatusApp.SUCCESS) {
         await writeFileLocal(strData);
-        return ret;
+        return StatusApp.SUCCESS;
       }
+      return StatusApp.ERROR;
     } catch(e) {
       print('Connection to Appwrite failed: $e');
-    }
-
-    try {
       Map<String, dynamic> dynamicData = await readFileLocal();
-      Map<String, String> strData = dynamicData.map((key, value) {
+      strData = dynamicData.map((key, value) {
         return MapEntry(key, value.toString());
       });
-      StatusApp ret = loadData(strData);
-      return ret;
-    } catch(e) {
-      print('Real file local failed: $e');
+      if(loadData() == StatusApp.SUCCESS) {
+        return StatusApp.CONNECT_SEVER_FAIL;
+      }
       return StatusApp.ERROR;
     }
   }
@@ -95,7 +92,7 @@ class Database {
     }
   }
 
-  StatusApp loadData(Map<String, String> strData) {
+  StatusApp loadData() {
     try{
       for(var key in strData.keys.toList()) {
         String strMonth = strData[key]!;
@@ -192,9 +189,26 @@ class Database {
     return resultData;
   }
 
+  List<String> getDataMonth() {
+    List<String> month = database.data.keys.toList();
+    month.sort((a, b) => b.substring(0,2).compareTo(a.substring(0,2)));
+    month.sort((a, b) => b.substring(3).compareTo(a.substring(3)));
+    return month;
+  }
+
   Future<StatusApp> addData(String month, DataModel item) async {
     try {
-      if (data.keys.contains(month)) {
+      var response = await databases.listDocuments(
+        databaseId: '66fd5e4c001b5722c3a4',
+        collectionId: '66fd5e670026f81adec9',
+        queries: [Query.equal('month', month)],
+      );
+
+      if (response.documents.isNotEmpty) {
+        if(strData[month] != response.documents.first.data['data']) {
+          return StatusApp.REQUEST_RESET;
+        }
+
         List<DataModel> dataMonth = data[month]!;
         int index = 0;
           for(index; index < dataMonth.length; index++) {
@@ -203,33 +217,20 @@ class Database {
           }
         }
         dataMonth.insert(index, item);
-        data[month] = dataMonth;
 
-        var response = await databases.listDocuments(
+        String str = '';
+        for (var value in dataMonth) {
+          str += '${value.day}|${value.name.index}|${value.item}|${value.itemType.index}|${value.useType.index}|${value.price}\n';
+        }
+
+        await databases.updateDocument(
           databaseId: '66fd5e4c001b5722c3a4',
           collectionId: '66fd5e670026f81adec9',
-          queries: [Query.equal('month', month)],
+          documentId: response.documents.first.$id,
+          data: {'data': str},
         );
 
-        if (response.documents.isNotEmpty) {
-          String documentId = response.documents.first.$id;
-
-          String strData = '';
-          for (var value in dataMonth) {
-            strData += '${value.day}|${value.name.index}|${value.item}|${value.itemType.index}|${value.useType.index}|${value.price}\n';
-          }
-
-          await databases.updateDocument(
-            databaseId: '66fd5e4c001b5722c3a4',
-            collectionId: '66fd5e670026f81adec9',
-            documentId: documentId,
-            data: {'data': strData},
-          );
-
-          return initialize();
-        } else {
-          return StatusApp.ERROR;
-        }
+        return StatusApp.SUCCESS;
       }
       else {
         String dataItem = '${item.day}|${item.name.index}|${item.item}|${item.itemType.index}|${item.useType.index}|${item.price}\n';
@@ -242,7 +243,7 @@ class Database {
             'data': dataItem,
           },
         );
-        return initialize();
+        return StatusApp.SUCCESS;
       }
     } catch(e) {
       print('Fail to add data: $e');
@@ -252,8 +253,6 @@ class Database {
 
   Future<StatusApp> removeData(String month, int index) async {
     try {
-      data[month]!.removeAt(index);
-
       var response = await databases.listDocuments(
         databaseId: '66fd5e4c001b5722c3a4',
         collectionId: '66fd5e670026f81adec9',
@@ -261,23 +260,36 @@ class Database {
       );
 
       if (response.documents.isNotEmpty) {
-        String documentId = response.documents.first.$id;
-
-        String strData = '';
-        for (var value in data[month]!) {
-          strData += '${value.day}|${value.name.index}|${value.item}|${value.itemType.index}|${value.useType.index}|${value.price}\n';
+        if(strData[month] != response.documents.first.data['data']) {
+          return StatusApp.REQUEST_RESET;
         }
 
-        await databases.updateDocument(
-          databaseId: '66fd5e4c001b5722c3a4',
-          collectionId: '66fd5e670026f81adec9',
-          documentId: documentId,
-          data: {'data': strData},
-        );
+        data[month]!.removeAt(index);
+        if(data[month]!.isNotEmpty) {
+          String str = '';
+          for (var value in data[month]!) {
+            str +=
+            '${value.day}|${value.name.index}|${value.item}|${value.itemType
+                .index}|${value.useType.index}|${value.price}\n';
+          }
 
-        return initialize();
+          await databases.updateDocument(
+            databaseId: '66fd5e4c001b5722c3a4',
+            collectionId: '66fd5e670026f81adec9',
+            documentId: response.documents.first.$id,
+            data: {'data': str},
+          );
+        } else {
+          await databases.deleteDocument(
+            databaseId: '66fd5e4c001b5722c3a4',
+            collectionId: '66fd5e670026f81adec9',
+            documentId: response.documents.first.$id,
+          );
+        }
+
+        return StatusApp.SUCCESS;
       } else {
-        return StatusApp.ERROR;
+        return StatusApp.REQUEST_RESET;
       }
     } catch(e) {
       print('Fail to remove data: $e');

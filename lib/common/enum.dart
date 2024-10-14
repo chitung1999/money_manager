@@ -1,6 +1,9 @@
 enum StatusApp {
   SUCCESS,
   ERROR,
+
+  CONNECT_SEVER_FAIL,
+  REQUEST_RESET,
 }
 
 enum MessageType {

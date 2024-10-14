@@ -2,6 +2,8 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 
+import 'enum.dart';
+
 OverlayEntry? _overlayEntry;
 Timer? _timer;
 
@@ -45,5 +47,33 @@ void showNotify(BuildContext context, bool status, String msg) {
   _timer = Timer(const Duration(seconds: 5), () {
     _overlayEntry?.remove();
     _overlayEntry = null;
+  });
+}
+
+void showErrorInitData(BuildContext context, StatusApp status) {
+  showDialog(context: context, builder: (BuildContext context) {
+    return AlertDialog(
+      title: Text('Cảnh báo', style: TextStyle(fontWeight: FontWeight.bold)),
+      content: Text(
+        status == StatusApp.ERROR ? 'Đã có lỗi xảy ra, không thể tải dữ liệu!' :
+        'Không thể kết nối tới máy chủ, dữ liệu có thể không được cập nhật!',
+        style: TextStyle(fontSize: 16),
+      ),
+      actions: [
+        TextButton(
+            child: Text('OK', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18)),
+            onPressed: () {Navigator.of(context).pop();}
+        ),
+      ],
+    );
+  });
+}
+
+void showWaitingProcess(BuildContext context) {
+  showDialog(context: context, builder: (BuildContext context) {
+    return Container(
+      color: Colors.black12,
+      child: Center(child: CircularProgressIndicator()),
+    );
   });
 }

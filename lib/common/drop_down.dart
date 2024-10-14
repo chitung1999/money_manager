@@ -43,8 +43,8 @@ class _DropDownState extends State<DropDown> {
         maxHeight: 300,
         scrollbarTheme: ScrollbarThemeData(
           radius: const Radius.circular(40),
-          thickness: WidgetStateProperty.all<double>(6),
-          thumbVisibility: WidgetStateProperty.all<bool>(true),
+          thickness: MaterialStateProperty.all<double>(6),
+          thumbVisibility: MaterialStateProperty.all<bool>(true),
         ),
       ),
       items: widget.data.map<DropdownMenuItem<String>>((String value) {

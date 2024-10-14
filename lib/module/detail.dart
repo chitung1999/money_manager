@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:money_manager/common/text_box_btn.dart';
 import '../common/drop_down.dart';
 import '../common/enum.dart';
 import '../common/notify.dart';
@@ -120,6 +119,7 @@ class _DetailState extends State<Detail> {
         Expanded(child: ListView(
           children: List.generate(
             _data.length, (index) => GestureDetector(
+            onTap: () {_onEdit(null);},
             onLongPress: () {_onEdit(index);},
             child: Container(
               height: 40,
@@ -136,25 +136,36 @@ class _DetailState extends State<Detail> {
                   ),
                   AnimatedPositioned(
                     duration: Duration(milliseconds: 200),
-                    right: _isEdit[index] ? 0 : -200,
-                    child: Row(
-                      children: [
-                        TextBoxBtn(title: 'Xoá', width: 100, height: 40, radius: 5, bgColor: Colors.red[400],
-                          outlineColor: Colors.transparent,
-                          onPressed: () async {
-                            StatusApp ret = await database.removeData(
-                              widget.month, index);
-                            if (ret == StatusApp.SUCCESS) {
-                              widget.onRemove(widget.month);
-                              showNotify(context, true, 'Thêm dữ liệu thành công');
+                    right: _isEdit[index] ? 0 : -150,
+                    child: Container(
+                      width: 150,
+                      color: Colors.red,
+                      child: IconButton(
+                        icon: Icon(Icons.delete, color: Colors.white70),
+                        onPressed: () async {
+                          showWaitingProcess(context);
+                          StatusApp ret = await database.removeData(widget.month, index);
+                          Navigator.of(context).pop();
+                          if (ret == StatusApp.SUCCESS) {
+                            String month = '';
+                            if(database.data[widget.month]!.isNotEmpty) {
+                              month = widget.month;
                             } else {
-                              showNotify(context, false, 'Không thể thêm dữ liệu!');
+                              List<String> months = database.getDataMonth();
+                              months.remove(widget.month);
+                              if(months.isNotEmpty) {
+                                month = months[0];
+                              }
                             }
+                            widget.onRemove(month);
+                            showNotify(context, true, 'Xoá dữ liệu thành công');
+                          } else if (ret == StatusApp.REQUEST_RESET) {
+                            showNotify(context, false, 'Vui lòng khởi động lại ứng dụng trước khi xoá dữ liệu!');
+                          } else {
+                            showNotify(context, false, 'Không thể xoá dữ liệu!');
                           }
-                        ),
-                        TextBoxBtn(title: 'Huỷ', width: 100, height: 40, radius: 5, bgColor: Colors.grey,
-                            outlineColor: Colors.transparent, onPressed: (){_onEdit(null);})
-                      ],
+                        }
+                      ),
                     ),
                   ),
                 ]
