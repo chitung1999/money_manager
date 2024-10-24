@@ -75,48 +75,48 @@ class _TheAppState extends State<TheApp> {
   Widget build(BuildContext context) {
     return FutureBuilder<void>(
       future: _initBuilder,
-        builder: (BuildContext context, AsyncSnapshot<void> snapshot) {
-          if (snapshot.connectionState == ConnectionState.done) {
-            return Scaffold(
-              appBar: AppBar(
-                title: Row(
-                  crossAxisAlignment: CrossAxisAlignment.end,
-                  children: [
-                    const Text('Money', style: TextStyle(fontSize: 30, fontWeight: FontWeight.bold, color: Colors.white)),
-                    const Text('manager', style: TextStyle(fontSize: 15, fontWeight: FontWeight.bold, color: Colors.white)),
-                  ],
-                ),
-                flexibleSpace: Container(
-                  decoration: const BoxDecoration(
-                    gradient: LinearGradient(
-                      colors: [Color(0xff355C7D), Color(0xff6C5B7B), Color(0xffC06C84)],
-                      stops: [0, 0.5, 1],
-                      begin: Alignment.centerLeft,
-                      end: Alignment.centerRight,
-                    ),
-                  ),
-                ),
-                actions: [
-                  DropDown(
-                      key: ValueKey(_currentMonth),
-                      data: _listMonth,
-                      currentValue: _currentMonth,
-                      onSelected: (String month) {
-                        setState(() {_currentMonth = month;});
-                      }
-                  ),
-                  const SizedBox(width: 20)
-                ],
-              ),
-              body: IndexedStack(
-                index: _currentIndex,
+      builder: (BuildContext context, AsyncSnapshot<void> snapshot) {
+        if (snapshot.connectionState == ConnectionState.done) {
+          return Scaffold(
+            appBar: AppBar(
+              title: Row(
+                crossAxisAlignment: CrossAxisAlignment.end,
                 children: [
-                  Home(key: ValueKey(_currentMonth), month: _currentMonth),
-                  Detail(key: ValueKey(_currentMonth), month: _currentMonth, onRemove: _onModify),
-                  AddItem(onAdd: _onModify),
+                  const Text('Money', style: TextStyle(fontSize: 30, fontWeight: FontWeight.bold, color: Colors.white)),
+                  const Text('manager', style: TextStyle(fontSize: 15, fontWeight: FontWeight.bold, color: Colors.white)),
                 ],
               ),
-              bottomNavigationBar: BottomNavigationBar(
+              flexibleSpace: Container(
+                decoration: const BoxDecoration(
+                  gradient: LinearGradient(
+                    colors: [Color(0xff355C7D), Color(0xff6C5B7B), Color(0xffC06C84)],
+                    stops: [0, 0.5, 1],
+                    begin: Alignment.centerLeft,
+                    end: Alignment.centerRight,
+                  ),
+                ),
+              ),
+              actions: [
+                DropDown(
+                    key: ValueKey(_currentMonth),
+                    data: _listMonth,
+                    currentValue: _currentMonth,
+                    onSelected: (String month) {
+                      setState(() {_currentMonth = month;});
+                    }
+                ),
+                const SizedBox(width: 20)
+              ],
+            ),
+            body: IndexedStack(
+              index: _currentIndex,
+              children: [
+                Home(key: ValueKey(_currentMonth), month: _currentMonth),
+                Detail(key: ValueKey(_currentMonth), month: _currentMonth, onRemove: _onModify),
+                AddItem(onAdd: _onModify),
+              ],
+            ),
+            bottomNavigationBar: BottomNavigationBar(
                   type: BottomNavigationBarType.fixed,
                   currentIndex: _currentIndex,
                   onTap: (index) {setState(() {_currentIndex = index;});},
@@ -126,10 +126,39 @@ class _TheAppState extends State<TheApp> {
                     BottomNavigationBarItem(icon: Icon(Icons.add_box_outlined), label: 'Thêm'),
                   ]
               )
-            );
-          } else {
-            return Center(child: const CircularProgressIndicator());
-          }
+          );
+        } else {
+          return Scaffold(
+            appBar: AppBar(
+              title: Row(
+                crossAxisAlignment: CrossAxisAlignment.end,
+                children: [
+                  const Text('Money', style: TextStyle(fontSize: 30, fontWeight: FontWeight.bold, color: Colors.white)),
+                  const Text('manager', style: TextStyle(fontSize: 15, fontWeight: FontWeight.bold, color: Colors.white)),
+                ],
+              ),
+              flexibleSpace: Container(
+                decoration: const BoxDecoration(
+                  gradient: LinearGradient(
+                    colors: [Color(0xff355C7D), Color(0xff6C5B7B), Color(0xffC06C84)],
+                    stops: [0, 0.5, 1],
+                    begin: Alignment.centerLeft,
+                    end: Alignment.centerRight,
+                  ),
+                ),
+              ),
+            ),
+            body: Center(child: CircularProgressIndicator()),
+            bottomNavigationBar: BottomNavigationBar(
+              type: BottomNavigationBarType.fixed,
+              items: const [
+                BottomNavigationBarItem(icon: Icon(Icons.home), label: 'Tổng quan'),
+                BottomNavigationBarItem(icon: Icon(Icons.list), label: 'Chi tiết'),
+                BottomNavigationBarItem(icon: Icon(Icons.add_box_outlined), label: 'Thêm'),
+              ]
+            )
+          );
+        }
       }
     );
   }

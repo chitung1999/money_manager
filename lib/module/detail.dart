@@ -126,46 +126,48 @@ class _DetailState extends State<Detail> {
               decoration: BoxDecoration(border: Border.all(color: Colors.blueGrey.withOpacity(0.2))),
               child: Stack(
                 children: [
-                  Row(
-                    children: [for(int i = 0; i < 6; i++)
-                      SizedBox(
-                        width: _width[i] * width,
-                        child: Center(child: Text(_data[index][i]))
-                      )
-                    ]
-                  ),
                   AnimatedPositioned(
                     duration: Duration(milliseconds: 200),
                     right: _isEdit[index] ? 0 : -150,
-                    child: Container(
-                      width: 150,
-                      color: Colors.red,
-                      child: IconButton(
-                        icon: Icon(Icons.delete, color: Colors.white70),
-                        onPressed: () async {
-                          showWaitingProcess(context);
-                          StatusApp ret = await database.removeData(widget.month, index);
-                          Navigator.of(context).pop();
-                          if (ret == StatusApp.SUCCESS) {
-                            String month = '';
-                            if(database.data[widget.month]!.isNotEmpty) {
-                              month = widget.month;
-                            } else {
-                              List<String> months = database.getDataMonth();
-                              months.remove(widget.month);
-                              if(months.isNotEmpty) {
-                                month = months[0];
+                    child: Row(
+                      children: [
+                        for(int i = 0; i < 6; i++)
+                          SizedBox(
+                            width: _width[i] * width,
+                            child: Center(child: Text(_data[index][i]))
+                          ),
+                        Container(
+                          width: 150,
+                          height: 40,
+                          color: Colors.red,
+                          child: IconButton(
+                            icon: Icon(Icons.delete, color: Colors.white70),
+                            onPressed: () async {
+                              showWaitingProcess(context);
+                              StatusApp ret = await database.removeData(widget.month, index);
+                              Navigator.of(context).pop();
+                              if (ret == StatusApp.SUCCESS) {
+                                String month = '';
+                                if(database.data[widget.month]!.isNotEmpty) {
+                                  month = widget.month;
+                                } else {
+                                  List<String> months = database.getDataMonth();
+                                  months.remove(widget.month);
+                                  if(months.isNotEmpty) {
+                                    month = months[0];
+                                  }
+                                }
+                                widget.onRemove(month);
+                                showNotify(context, true, 'Xoá dữ liệu thành công');
+                              } else if (ret == StatusApp.REQUEST_RESET) {
+                                showNotify(context, false, 'Vui lòng khởi động lại ứng dụng trước khi xoá dữ liệu!');
+                              } else {
+                                showNotify(context, false, 'Không thể xoá dữ liệu!');
                               }
                             }
-                            widget.onRemove(month);
-                            showNotify(context, true, 'Xoá dữ liệu thành công');
-                          } else if (ret == StatusApp.REQUEST_RESET) {
-                            showNotify(context, false, 'Vui lòng khởi động lại ứng dụng trước khi xoá dữ liệu!');
-                          } else {
-                            showNotify(context, false, 'Không thể xoá dữ liệu!');
-                          }
-                        }
-                      ),
+                          ),
+                        ),
+                      ],
                     ),
                   ),
                 ]
